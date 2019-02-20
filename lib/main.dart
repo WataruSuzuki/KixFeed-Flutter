@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:webfeed/webfeed.dart';
 
 void main() => runApp(MyApp());
 
@@ -48,6 +50,25 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _incrementCounter() {
     setState(() {
+      Future<http.Response> response = fetchPost();
+      response.then((getting) {
+        var feed = new RssFeed.parse(getting.body); // for parsing RSS feed
+        print(feed.title);
+        print(feed.description);
+        print(feed.link);
+        print(feed.author);
+        print(feed.copyright);
+        print(feed.dc);
+        print(feed.items.length);
+
+        RssItem item = feed.items.first;
+        print(item.title);
+        print(item.description);
+        print(item.link);
+        print(item.source);
+        print(item.media);
+      });
+
       // This call to setState tells the Flutter framework that something has
       // changed in this State, which causes it to rerun the build method below
       // so that the display can reflect the updated values. If we changed
@@ -108,4 +129,9 @@ class _MyHomePageState extends State<MyHomePage> {
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
+
+  Future<http.Response> fetchPost() async {
+    return http.get('https://sneakerwars.jp/items.rss');
+  }
+
 }
