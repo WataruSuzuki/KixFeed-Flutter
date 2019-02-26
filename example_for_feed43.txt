@@ -1,0 +1,13 @@
+<article class="article-list new">{*}
+<div class="article-img">{*}
+<a href="{%}" class="opacity-link">{*}
+<img src="{%}" alt="{%}">{*}
+</a>{*}
+</div>{*}
+<h3 class="article-title">{*}
+<a href="{%}" class="opacity-link">{%}</a>{*}
+</h3>{*}
+<p class="article-detail-text">{*}
+<a href="{%}" class="opacity-link">{%}</a>{*}
+</p>{*}
+</article>{*}
