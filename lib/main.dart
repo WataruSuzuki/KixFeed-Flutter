@@ -50,24 +50,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _incrementCounter() {
     setState(() {
-      Future<http.Response> response = fetchPost();
-      response.then((getting) {
-        var feed = new RssFeed.parse(getting.body); // for parsing RSS feed
-        print(feed.title);
-        print(feed.description);
-        print(feed.link);
-        print(feed.author);
-        print(feed.copyright);
-        print(feed.dc);
-        print(feed.items.length);
-
-        RssItem item = feed.items.first;
-        print(item.title);
-        print(item.description);
-        print(item.link);
-        print(item.source);
-        print(item.media);
-      });
 
       // This call to setState tells the Flutter framework that something has
       // changed in this State, which causes it to rerun the build method below
@@ -80,58 +62,87 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+    var futureBuilder = new FutureBuilder(
+      future: _getData(),
+      builder: (BuildContext context, AsyncSnapshot snapshot) {
+        switch (snapshot.connectionState) {
+          case ConnectionState.none:
+          case ConnectionState.waiting:
+            return new Text('loading...');
+          default:
+            if (snapshot.hasError)
+              return new Text('Error: ${snapshot.error}');
+            else
+              return createListView(context, snapshot);
+        }
+      },
+    );
+
+    return new Scaffold(
+      appBar: new AppBar(
+        title: new Text("Home Page"),
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.display1,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      body: futureBuilder,
     );
   }
 
-  Future<http.Response> fetchPost() async {
-    return http.get('https://sneakerwars.jp/items.rss');
+  Future<List<RssItem>> _getData() async {
+    var feedUrls = [
+      'https://feed43.com/1803128423885152.xml',
+      'https://sneakerwars.jp/items.rss'
+    ];
+    var items = new List<RssItem>();
+    for (var url in feedUrls) {
+      var httpResponse = await http.get(url);
+      var feed = new RssFeed.parse(httpResponse.body); // for parsing RSS feed
+      items += feed.items;
+    }
+    return items;
   }
 
+  Widget createListView(BuildContext context, AsyncSnapshot snapshot) {
+    List<RssItem> feedItems = snapshot.data;
+    return new ListView.builder(
+      itemCount: feedItems.length,
+      itemBuilder: (BuildContext context, int index) {
+        return Card(
+          child: Column(
+            children: <Widget>[
+              Image.network(parseImageUrl(feedItems[index].description)),
+              Container(
+                  margin: EdgeInsets.all(10.0),
+                  child: ListTile(
+                    title: Text(feedItems[index].title),
+                    subtitle: Text(parseDescription(feedItems[index].description)),
+                    isThreeLine: true,
+                  )),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  String parseImageUrl(String material) {
+    RegExp exp = RegExp(r"http(s)?://([\w-]+\.)+[\w-]+(/[\w- ./?%&=]*)?");
+    Iterable<Match> matches = exp.allMatches(material);
+    for (Match m in matches) {
+      for (int i = 0; i < m.groupCount; i++) {
+        if (m.group(i).contains('.png') || m.group(i).contains('.jpg') || m.group(i).contains('.jpeg')) {
+          return m.group(i);
+        }
+      }
+    }
+    return 'http://hp.t-alive.com/wp-content/uploads/2013/11/oops.png';
+  }
+
+  String parseDescription(String material) {
+    RegExp exp = new RegExp(r'^(.+)</a>(.+)$');
+    var match = exp.firstMatch(material.replaceAll("<p><sub><i>-- Delivered by <a href=\"http://feed43.com/\">Feed43</a> service</i></sub></p>", '').replaceAll('\n', ''));
+    if (match != null) {
+      return match.group(2).substring(0, 50) + '...';
+    }
+    print(material);
+    return '';
+  }
 }
