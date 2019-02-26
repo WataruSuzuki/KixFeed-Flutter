@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:webfeed/webfeed.dart';
+import 'package:intl/intl.dart';
 
 void main() => runApp(MyApp());
 
@@ -80,7 +81,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return new Scaffold(
       appBar: new AppBar(
-        title: new Text("Home Page"),
+        title: new Text("フィード"),
       ),
       body: futureBuilder,
     );
@@ -97,7 +98,15 @@ class _MyHomePageState extends State<MyHomePage> {
       var feed = new RssFeed.parse(httpResponse.body); // for parsing RSS feed
       items += feed.items;
     }
+    items.sort((b,a) => parsePubDate(a.pubDate).compareTo(parsePubDate(b.pubDate)));
     return items;
+  }
+
+  DateTime parsePubDate(String pubDate) {
+    var format = DateFormat('EEE, d MMM yyyy HH:mm:ss Z');
+    var date = format.parse(pubDate);
+
+    return date;
   }
 
   Widget createListView(BuildContext context, AsyncSnapshot snapshot) {
@@ -105,6 +114,22 @@ class _MyHomePageState extends State<MyHomePage> {
     return new ListView.builder(
       itemCount: feedItems.length,
       itemBuilder: (BuildContext context, int index) {
+//        return GestureDetector(
+//          key: Key(menu[index]),
+//          child: Text(menu[index]),
+//          onTapUp: (details) {
+//            Navigator.push(context, new MaterialPageRoute<Null>(
+//                settings: const RouteSettings(name: "/hogefuga"),
+//                builder: (BuildContext context) {
+//                  switch (menu[index]) {
+//                    default:
+//                      return new HogeFuga();
+//                  }
+//                }
+//            ));
+//          },
+//        );
+
         return Card(
           child: Column(
             children: <Widget>[
