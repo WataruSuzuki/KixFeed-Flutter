@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="jchankchan.co.jp.kix_feed">
+    package="jp.co.jchankchan.kix_feed">
 
     <!-- io.flutter.app.FlutterApplication is an android.app.Application that
          calls FlutterMain.startInitialization(this); in its onCreate method.
@@ -10,6 +10,9 @@
         android:name="io.flutter.app.FlutterApplication"
         android:label="kix_feed"
         android:icon="@mipmap/ic_launcher">
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-3940256099942544~3347511713"/>
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

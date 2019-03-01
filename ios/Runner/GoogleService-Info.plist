@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>196172853149-8rcn9d8qsmtp30eborogd1ejpsatc3oc.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.196172853149-8rcn9d8qsmtp30eborogd1ejpsatc3oc</string>
+	<key>API_KEY</key>
+	<string>foobar</string>
+	<key>GCM_SENDER_ID</key>
+	<string>196172853149</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>jp.co.jchankchan.kixFeed</string>
+	<key>PROJECT_ID</key>
+	<string>kix-feed</string>
+	<key>STORAGE_BUCKET</key>
+	<string>kix-feed.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:196172853149:ios:59f47f44a0a332d3</string>
+	<key>DATABASE_URL</key>
+	<string>https://kix-feed.firebaseio.com</string>
+</dict>
+</plist>

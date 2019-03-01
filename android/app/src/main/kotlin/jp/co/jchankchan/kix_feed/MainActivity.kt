@@ -1,4 +1,4 @@
-package jchankchan.co.jp.kix_feed
+package jp.co.jchankchan.kix_feed
 
 import android.os.Bundle
 

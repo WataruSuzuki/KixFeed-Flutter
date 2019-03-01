@@ -2,10 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:webfeed/webfeed.dart';
+import 'package:firebase_admob/firebase_admob.dart';
 
 import 'detail_feed_post.dart';
 
-void main() => runApp(MyApp());
+void main() {
+    FirebaseAdMob.instance.initialize(appId: 'ca-app-pub-3940256099942544~3347511713');
+    runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
     // This widget is the root of your application.
@@ -16,7 +20,7 @@ class MyApp extends StatelessWidget {
             theme: ThemeData(
                 primarySwatch: Colors.blue,
             ),
-            home: MyHomePage(title: 'Flutter Demo Home Page'),
+            home: MyHomePage(title: 'ニュース'),
         );
     }
 }
@@ -27,14 +31,30 @@ class MyHomePage extends StatefulWidget {
     final String title;
 
     @override
-    _MyHomePageState createState() => _MyHomePageState();
+    _MyHomePageState createState() => _MyHomePageState(title: title);
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-    List<Widget> children = List<Widget>();
+    final String title;
+
+    _MyHomePageState({Key key, this.title});
+
     List<RssItem> feedItems = List<RssItem>();
 
+    InterstitialAd interstitialAd = InterstitialAd(
+        // Replace the testAdUnitId with an ad unit id from the AdMob dash.
+        // https://developers.google.com/admob/android/test-ads
+        // https://developers.google.com/admob/ios/test-ads
+        adUnitId: InterstitialAd.testAdUnitId,
+        listener: (MobileAdEvent event) {
+            print("InterstitialAd event is $event");
+        },
+    );
+
     Future<void> _refresh() async {
+        if (await interstitialAd.isLoaded()) {
+            interstitialAd.show();
+        }
         setState(() {
             feedItems.clear();
         });
@@ -62,13 +82,15 @@ class _MyHomePageState extends State<MyHomePage> {
 
         return new Scaffold(
             appBar: new AppBar(
-                title: new Text("フィード"),
+                title: new Text(title),
             ),
             body: futureBuilder,
         );
     }
 
     Future<List<RssItem>> _getData() async {
+        interstitialAd.load();
+
         if (feedItems.isNotEmpty) {
             return feedItems;
         }
@@ -77,7 +99,6 @@ class _MyHomePageState extends State<MyHomePage> {
             'https://feed43.com/1803128423885152.xml',
             'https://sneakerwars.jp/items.rss'
         ];
-        feedItems = new List<RssItem>();
         for (var url in feedUrls) {
             var httpResponse = await http.get(url);
             var feed = new RssFeed.parse(
@@ -123,6 +144,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             ),
                         ),
                         onTapUp: (details) {
+                            interstitialAd.show();
                             Navigator.push(
                                 context,
                                 new MaterialPageRoute<Null>(
