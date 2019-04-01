@@ -1,0 +1,4 @@
+<div id="{%}" class="{%}">{*}
+<div class="entry-thumb">{*}
+<a href="{%}" class="entry-image entry-image-link" title="{%}"><img width="{%}" height="{%}" src="{%}" class="entry-thumnail wp-post-image" alt="{%}" srcset="{%}" sizes="{%}" /></a>{*}
+</div>{*}

@@ -96,7 +96,7 @@ class _MyHomePageState extends State<MyHomePage> {
         }
 
         var feedUrls = [
-            'https://feed43.com/1803128423885152.xml',
+            'https://feed43.com/4867847448366306.xml',
             'https://sneakerwars.jp/items.rss'
         ];
         for (var url in feedUrls) {
