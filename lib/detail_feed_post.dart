@@ -18,6 +18,13 @@ class DetailFeedPost extends StatelessWidget {
                 initialUrl: url,
                 javascriptMode: JavascriptMode.unrestricted,
             ),
+            floatingActionButton: FloatingActionButton(
+                onPressed: () {
+                    // Add your onPressed code here!
+                },
+                child: Icon(Icons.favorite),
+                backgroundColor: Colors.pink,
+            )
         );
     }
 }
