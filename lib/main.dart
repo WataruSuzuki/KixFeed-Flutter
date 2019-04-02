@@ -20,27 +20,26 @@ class MyApp extends StatelessWidget {
             theme: ThemeData(
                 primarySwatch: Colors.blue,
             ),
-            home: MyHomePage(title: 'ニュース'),
+            home: MyHomePage(),
         );
     }
 }
 
 class MyHomePage extends StatefulWidget {
-    MyHomePage({Key key, this.title}) : super(key: key);
-
-    final String title;
+    MyHomePage({Key key}) : super(key: key);
 
     @override
-    _MyHomePageState createState() => _MyHomePageState(title: title);
+    _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-    final String title;
 
-    _MyHomePageState({Key key, this.title});
+    _MyHomePageState({Key key});
 
     List<RssItem> feedItems = List<RssItem>();
-    
+    bool isShowingFavorites = false;
+    final String _textNews = 'ニュース一覧';
+    final String _textFavorites = 'お気に入り一覧';
 
     InterstitialAd interstitialAd = InterstitialAd(
         // Replace the testAdUnitId with an ad unit id from the AdMob dash.
@@ -83,7 +82,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
         return new Scaffold(
             appBar: new AppBar(
-                title: new Text(title),
+                title: new Text(isShowingFavorites ? _textFavorites : _textNews),
             ),
             body: futureBuilder,
             drawer: Drawer(
@@ -97,14 +96,20 @@ class _MyHomePageState extends State<MyHomePage> {
                             ),
                         ),
                         ListTile(
-                            title: Text('ニュース一覧'),
+                            title: Text(_textNews),
                             onTap: () {
+                                setState(() {
+                                    isShowingFavorites = false;
+                                });
                                 Navigator.pop(context);
                             },
                         ),
                         ListTile(
                             title: Text('お気に入り一覧'),
                             onTap: () {
+                                setState(() {
+                                    isShowingFavorites = true;
+                                });
                                 Navigator.pop(context);
                             },
                         ),
