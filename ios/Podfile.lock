@@ -59,12 +59,15 @@ PODS:
     - nanopb/encode (= 0.3.901)
   - nanopb/decode (0.3.901)
   - nanopb/encode (0.3.901)
+  - shared_preferences (0.0.1):
+    - Flutter
   - webview_flutter (0.0.1):
     - Flutter
 
 DEPENDENCIES:
   - firebase_admob (from `.symlinks/plugins/firebase_admob/ios`)
   - Flutter (from `.symlinks/flutter/ios`)
+  - shared_preferences (from `.symlinks/plugins/shared_preferences/ios`)
   - webview_flutter (from `.symlinks/plugins/webview_flutter/ios`)
 
 SPEC REPOS:
@@ -83,6 +86,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/firebase_admob/ios"
   Flutter:
     :path: ".symlinks/flutter/ios"
+  shared_preferences:
+    :path: ".symlinks/plugins/shared_preferences/ios"
   webview_flutter:
     :path: ".symlinks/plugins/webview_flutter/ios"
 
@@ -97,6 +102,7 @@ SPEC CHECKSUMS:
   GoogleAppMeasurement: 1624046ab1bcc5e170061a56ef5679000b079c8e
   GoogleUtilities: 6481e6318c5fcabaaa8513ef8120f329055d7c10
   nanopb: 2901f78ea1b7b4015c860c2fdd1ea2fee1a18d48
+  shared_preferences: 5a1d487c427ee18fcd3ea1f2a131569481834b53
   webview_flutter: 9bd234c07e99632356cba112df56fd1d47d6b6e3
 
 PODFILE CHECKSUM: ebd43b443038e611b86ede96e613bd6033c49497

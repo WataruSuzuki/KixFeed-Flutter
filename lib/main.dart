@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:webfeed/webfeed.dart';
 import 'package:firebase_admob/firebase_admob.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'detail_feed_post.dart';
 
@@ -36,10 +37,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
     _MyHomePageState({Key key});
 
-    List<RssItem> feedItems = List<RssItem>();
-    bool isShowingFavorites = false;
+    List<RssItem> _feedItems = List<RssItem>();
+    List<RssItem> _newsItems = List<RssItem>();
+    List<RssItem> _favoriteItems = List<RssItem>();
+    bool _isShowingFavorites = false;
     final String _textNews = 'ニュース一覧';
     final String _textFavorites = 'お気に入り一覧';
+    Set<String> _favoriteKeys;
 
     InterstitialAd interstitialAd = InterstitialAd(
         // Replace the testAdUnitId with an ad unit id from the AdMob dash.
@@ -56,7 +60,12 @@ class _MyHomePageState extends State<MyHomePage> {
             interstitialAd.show();
         }
         setState(() {
-            feedItems.clear();
+            if (_isShowingFavorites) {
+                _favoriteItems.clear();
+            } else {
+                _newsItems.clear();
+            }
+            _feedItems.clear();
         });
     }
 
@@ -82,7 +91,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
         return new Scaffold(
             appBar: new AppBar(
-                title: new Text(isShowingFavorites ? _textFavorites : _textNews),
+                title: new Text(_isShowingFavorites ? _textFavorites : _textNews),
             ),
             body: futureBuilder,
             drawer: Drawer(
@@ -99,7 +108,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             title: Text(_textNews),
                             onTap: () {
                                 setState(() {
-                                    isShowingFavorites = false;
+                                    _isShowingFavorites = false;
                                 });
                                 Navigator.pop(context);
                             },
@@ -108,7 +117,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             title: Text('お気に入り一覧'),
                             onTap: () {
                                 setState(() {
-                                    isShowingFavorites = true;
+                                    _isShowingFavorites = true;
                                 });
                                 Navigator.pop(context);
                             },
@@ -122,25 +131,44 @@ class _MyHomePageState extends State<MyHomePage> {
     Future<List<RssItem>> _getData() async {
         interstitialAd.load();
 
-        if (feedItems.isNotEmpty) {
-            return feedItems;
-        }
+        if (_isShowingFavorites) {
+            if (_favoriteItems.isEmpty) {
+                SharedPreferences pref = await SharedPreferences.getInstance();
+                _favoriteKeys = pref.getKeys();
 
-        var feedUrls = [
-            'https://feed43.com/4867847448366306.xml',
-            'https://sneakerwars.jp/items.rss'
-        ];
-        for (var url in feedUrls) {
-            var httpResponse = await http.get(url);
-            var feed = new RssFeed.parse(
-                httpResponse.body); // for parsing RSS feed
-            feedItems += feed.items;
+                _favoriteKeys.forEach((key) {
+                    if (key.contains('link:')) {
+                        var title = key.replaceAll('link:', '');
+                        _favoriteItems.add(RssItem(
+                            title: title,
+                            description: pref.getString('description:$title'),
+                            link: pref.getString(key)
+                        ));
+                    }
+                });
+            }
+            _feedItems = _favoriteItems;
+        } else {
+            if (_newsItems.isEmpty) {
+                var feedUrls = [
+                    'https://feed43.com/4867847448366306.xml',
+                    'https://sneakerwars.jp/items.rss'
+                ];
+                for (var url in feedUrls) {
+                    var httpResponse = await http.get(url);
+                    var feed = new RssFeed.parse(
+                        httpResponse.body); // for parsing RSS feed
+                    _newsItems += feed.items;
+                }
+            }
+
+            _feedItems = _newsItems;
         }
-        feedItems.sort(
+        _feedItems.sort(
                 (b, a) =>
                 parsePubDate(a.pubDate).compareTo(parsePubDate(b.pubDate)));
 
-        return feedItems;
+        return _feedItems;
     }
 
     DateTime parsePubDate(String pubDate) {
@@ -160,14 +188,14 @@ class _MyHomePageState extends State<MyHomePage> {
                         child: new Card(
                             child: Column(
                                 children: <Widget>[
-                                    Image.network(parseImageUrl(
+                                    Image.network(DetailFeedPost.parseImageUrl(
                                         feedItems[index].description)),
                                     Container(
                                         margin: EdgeInsets.all(10.0),
                                         child: ListTile(
                                             title: Text(feedItems[index].title),
                                             subtitle:
-                                            Text(parseDescription(
+                                            Text(DetailFeedPost.parseDescription(
                                                 feedItems[index].description)),
                                             isThreeLine: true,
                                         )),
@@ -182,8 +210,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                     settings: const RouteSettings(name: "/feeds"),
                                     builder: (BuildContext context) {
                                         return new DetailFeedPost(
-                                            feedItems[index].title,
-                                            feedItems[index].link
+                                            feedItems[index]
                                         );
                                     }));
                         },
@@ -192,34 +219,5 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             onRefresh: _refresh,
         );
-    }
-
-    String parseImageUrl(String material) {
-        RegExp exp = RegExp(r"http(s)?://([\w-]+\.)+[\w-]+(/[\w- ./?%&=]*)?");
-        Iterable<Match> matches = exp.allMatches(material);
-        for (Match m in matches) {
-            for (int i = 0; i < m.groupCount; i++) {
-                if (m.group(i).contains('.png') ||
-                    m.group(i).contains('.jpg') ||
-                    m.group(i).contains('.jpeg')) {
-                    return m.group(i);
-                }
-            }
-        }
-        return 'http://hp.t-alive.com/wp-content/uploads/2013/11/oops.png';
-    }
-
-    String parseDescription(String material) {
-        RegExp exp = new RegExp(r'^(.+)</a>(.+)$');
-        var match = exp.firstMatch(material
-            .replaceAll(
-            "<p><sub><i>-- Delivered by <a href=\"http://feed43.com/\">Feed43</a> service</i></sub></p>",
-            '')
-            .replaceAll('\n', ''));
-        if (match != null) {
-            return match.group(2).substring(0, 50) + '...';
-        }
-        print(material);
-        return '';
     }
 }
