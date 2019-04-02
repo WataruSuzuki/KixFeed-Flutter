@@ -40,6 +40,7 @@ class _MyHomePageState extends State<MyHomePage> {
     _MyHomePageState({Key key, this.title});
 
     List<RssItem> feedItems = List<RssItem>();
+    
 
     InterstitialAd interstitialAd = InterstitialAd(
         // Replace the testAdUnitId with an ad unit id from the AdMob dash.
@@ -85,6 +86,31 @@ class _MyHomePageState extends State<MyHomePage> {
                 title: new Text(title),
             ),
             body: futureBuilder,
+            drawer: Drawer(
+                child: ListView(
+                    padding: EdgeInsets.zero,
+                    children: <Widget>[
+                        DrawerHeader(
+                            child: Text('メニュー'),
+                            decoration: BoxDecoration(
+                                color: Colors.blue,
+                            ),
+                        ),
+                        ListTile(
+                            title: Text('ニュース一覧'),
+                            onTap: () {
+                                Navigator.pop(context);
+                            },
+                        ),
+                        ListTile(
+                            title: Text('お気に入り一覧'),
+                            onTap: () {
+                                Navigator.pop(context);
+                            },
+                        ),
+                    ],
+                ),
+            ),
         );
     }
 
