@@ -7,8 +7,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'detail_feed_post.dart';
 
+const String admobAppId = 'ca-app-pub-3940256099942544~3347511713';
+String admobInterstitialId = InterstitialAd.testAdUnitId;
+
 void main() {
-    FirebaseAdMob.instance.initialize(appId: 'ca-app-pub-3940256099942544~3347511713');
+    FirebaseAdMob.instance.initialize(appId: admobAppId);
     runApp(MyApp());
 }
 
@@ -46,10 +49,7 @@ class _MyHomePageState extends State<MyHomePage> {
     Set<String> _favoriteKeys;
 
     InterstitialAd interstitialAd = InterstitialAd(
-        // Replace the testAdUnitId with an ad unit id from the AdMob dash.
-        // https://developers.google.com/admob/android/test-ads
-        // https://developers.google.com/admob/ios/test-ads
-        adUnitId: InterstitialAd.testAdUnitId,
+        adUnitId: admobInterstitialId,
         listener: (MobileAdEvent event) {
             print("InterstitialAd event is $event");
         },
