@@ -181,7 +181,9 @@ class _MyHomePageState extends State<MyHomePage> {
     Widget createListView(BuildContext context, AsyncSnapshot snapshot) {
         List<RssItem> feedItems = snapshot.data;
         return new RefreshIndicator(
-            child: ListView.builder(
+            child: feedItems.isEmpty
+                ? Center(child: Text('データがありません', style: TextStyle(fontSize: 24),))
+                :ListView.builder(
                 itemCount: feedItems.length,
                 itemBuilder: (BuildContext context, int index) {
                     return GestureDetector(
