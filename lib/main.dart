@@ -151,7 +151,7 @@ class _MyHomePageState extends State<MyHomePage> {
         } else {
             if (_newsItems.isEmpty) {
                 var feedUrls = [
-                    'https://feed43.com/4867847448366306.xml',
+                    'http://sneakerbucks.com/feed',
                     'https://sneakerwars.jp/items.rss'
                 ];
                 for (var url in feedUrls) {
