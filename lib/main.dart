@@ -156,8 +156,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ];
                 for (var url in feedUrls) {
                     var httpResponse = await http.get(url);
-                    var feed = new RssFeed.parse(
-                        httpResponse.body); // for parsing RSS feed
+                    var feed = RssFeed.parse(httpResponse.body); // for parsing RSS feed
                     _newsItems += feed.items;
                 }
             }
@@ -191,14 +190,18 @@ class _MyHomePageState extends State<MyHomePage> {
                             child: Column(
                                 children: <Widget>[
                                     Image.network(DetailFeedPost.parseImageUrl(
-                                        feedItems[index].description)),
+                                        feedItems[index].content != null
+                                            ? feedItems[index].content.images.first
+                                            : feedItems[index].description)
+                                    ),
                                     Container(
                                         margin: EdgeInsets.all(10.0),
                                         child: ListTile(
                                             title: Text(feedItems[index].title),
                                             subtitle:
                                             Text(DetailFeedPost.parseDescription(
-                                                feedItems[index].description)),
+                                                feedItems[index].description)
+                                            ),
                                             isThreeLine: true,
                                         )),
                                 ],
