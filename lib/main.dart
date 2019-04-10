@@ -6,6 +6,7 @@ import 'package:firebase_admob/firebase_admob.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'detail_feed_post.dart';
+import 'simple_show_web.dart';
 
 const String admobAppId = 'ca-app-pub-3940256099942544~3347511713';
 String admobInterstitialId = InterstitialAd.testAdUnitId;
@@ -122,6 +123,40 @@ class _MyHomePageState extends State<MyHomePage> {
                                 Navigator.pop(context);
                             },
                         ),
+                        ListTile(
+                            title: Text('利用規約'),
+                            onTap: () {
+                                Navigator.pop(context);
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute<Null>(
+                                        settings: const RouteSettings(name: "/feeds"),
+                                        builder: (BuildContext context) {
+                                            return new SimpleShowWeb(
+                                                '利用規約',
+                                                'https://watarusuzuki.github.io/KixFeed-Flutter/terms.html'
+                                            );
+                                        })
+                                );
+                            },
+                        ),
+                        ListTile(
+                            title: Text('プライバシーポリシー'),
+                            onTap: () {
+                                Navigator.pop(context);
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute<Null>(
+                                        settings: const RouteSettings(name: "/feeds"),
+                                        builder: (BuildContext context) {
+                                            return new SimpleShowWeb(
+                                                'プライバシーポリシー',
+                                                'https://watarusuzuki.github.io/KixFeed-Flutter/privacy_policy.html'
+                                            );
+                                        })
+                                );
+                            },
+                        ),
                     ],
                 ),
             ),
@@ -211,13 +246,14 @@ class _MyHomePageState extends State<MyHomePage> {
                             interstitialAd.show();
                             Navigator.push(
                                 context,
-                                new MaterialPageRoute<Null>(
+                                MaterialPageRoute<Null>(
                                     settings: const RouteSettings(name: "/feeds"),
                                     builder: (BuildContext context) {
                                         return new DetailFeedPost(
                                             feedItems[index]
                                         );
-                                    }));
+                                    })
+                            );
                         },
                     );
                 },
