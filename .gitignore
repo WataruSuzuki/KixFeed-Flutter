@@ -61,6 +61,8 @@
 **/ios/Flutter/flutter_assets/
 **/ios/ServiceDefinitions.json
 **/ios/Runner/GeneratedPluginRegistrant.*
+**/ios/out_archives
+**/ios/out_ipa
 
 # Exceptions to above rules.
 !**/ios/**/default.mode1v3
