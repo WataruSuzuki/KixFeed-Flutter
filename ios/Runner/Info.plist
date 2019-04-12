@@ -52,5 +52,18 @@
 	<false/>
 	<key>io.flutter.embedded_views_preview</key>
 	<string>YES</string>
+    <key>CFBundleURLTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <!-- TODO Replace this value: -->
+                <!-- Copied from GoogleServices-Info.plist key REVERSED_CLIENT_ID -->
+                <string>com.googleusercontent.apps.196172853149-8rcn9d8qsmtp30eborogd1ejpsatc3oc</string>
+            </array>
+        </dict>
+    </array>
 </dict>
 </plist>
