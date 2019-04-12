@@ -32,6 +32,9 @@ dependencies:
   # Use AdMob.
   firebase_admob: ^0.9.0
 
+  # Use Firebase modules.
+  cloud_firestore: ^0.12.6
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
