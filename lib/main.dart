@@ -5,8 +5,8 @@ import 'package:webfeed/webfeed.dart';
 import 'package:firebase_admob/firebase_admob.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'drawer_header.dart';
 import 'detail_feed_post.dart';
-import 'simple_show_web.dart';
 
 const String admobAppId = 'ca-app-pub-3940256099942544~3347511713';
 String admobInterstitialId = InterstitialAd.testAdUnitId;
@@ -44,7 +44,8 @@ class _MyHomePageState extends State<MyHomePage> {
     List<RssItem> _feedItems = List<RssItem>();
     List<RssItem> _newsItems = List<RssItem>();
     List<RssItem> _favoriteItems = List<RssItem>();
-    bool _isShowingFavorites = false;
+    Selection _selection = Selection.news;
+    final String _textPosts = 'ピック＆トーク';
     final String _textNews = 'ニュース一覧';
     final String _textFavorites = 'お気に入り一覧';
     Set<String> _favoriteKeys;
@@ -61,17 +62,33 @@ class _MyHomePageState extends State<MyHomePage> {
             interstitialAd.show();
         }
         setState(() {
-            if (_isShowingFavorites) {
-                _favoriteItems.clear();
-            } else {
-                _newsItems.clear();
+            switch (_selection) {
+                case Selection.posts:
+                    break;
+                case Selection.news:
+                    _newsItems.clear();
+                    break;
+                case Selection.favorites:
+                    _newsItems.clear();
+                    _favoriteItems.clear();
             }
             _feedItems.clear();
         });
     }
 
+    tapDrawerBody(Selection next) {
+        setState(() {
+            _selection = next;
+        });
+        Navigator.pop(context);
+    }
+
     @override
     Widget build(BuildContext context) {
+        var titles = [
+            _textNews,
+            _textFavorites
+        ];
         var futureBuilder = new FutureBuilder(
             future: _getData(),
             builder: (BuildContext context, AsyncSnapshot snapshot) {
@@ -89,76 +106,53 @@ class _MyHomePageState extends State<MyHomePage> {
                 }
             },
         );
+        var popupMenu = List<PopupMenuEntry<String>>();
+
+        var keys = [
+            '(・∀・)'
+            '更新',
+            'お気に入りを削除'
+        ];
+        var menuKey = keys[_selection.index];
+        popupMenu.add(PopupMenuItem<String>(
+            value: menuKey,
+            key: Key(menuKey.toString()),
+            child: Text(menuKey.toString()),)
+        );
 
         return new Scaffold(
             appBar: new AppBar(
-                title: new Text(_isShowingFavorites ? _textFavorites : _textNews),
+                title: new Text(titles[_selection.index]),
+                actions: <Widget>[
+                    PopupMenuButton<String>(
+                        onSelected: (String key) {
+                            switch (key) {
+                                case '更新':
+                                    _refresh();
+                                    break;
+                                case 'お気に入りを削除':
+                                    _favoriteKeys.forEach((key) {
+                                        DetailFeedPost.deleteData(key);
+                                    });
+                                    _favoriteKeys.clear();
+                                    setState(() {
+                                        _favoriteItems.clear();
+                                    });
+                                    break;
+                            }
+                        },
+                        itemBuilder: (BuildContext context) => popupMenu,
+                        key: Key('PopupMenuButton'),
+                    )
+                ],
             ),
             body: futureBuilder,
-            drawer: Drawer(
-                child: ListView(
-                    padding: EdgeInsets.zero,
-                    children: <Widget>[
-                        DrawerHeader(
-                            child: Text('メニュー'),
-                            decoration: BoxDecoration(
-                                color: Colors.blue,
-                            ),
-                        ),
-                        ListTile(
-                            title: Text(_textNews),
-                            onTap: () {
-                                setState(() {
-                                    _isShowingFavorites = false;
-                                });
-                                Navigator.pop(context);
-                            },
-                        ),
-                        ListTile(
-                            title: Text('お気に入り一覧'),
-                            onTap: () {
-                                setState(() {
-                                    _isShowingFavorites = true;
-                                });
-                                Navigator.pop(context);
-                            },
-                        ),
-                        ListTile(
-                            title: Text('利用規約'),
-                            onTap: () {
-                                Navigator.pop(context);
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute<Null>(
-                                        settings: const RouteSettings(name: "/feeds"),
-                                        builder: (BuildContext context) {
-                                            return new SimpleShowWeb(
-                                                '利用規約',
-                                                'https://watarusuzuki.github.io/KixFeed-Flutter/terms.html'
-                                            );
-                                        })
-                                );
-                            },
-                        ),
-                        ListTile(
-                            title: Text('プライバシーポリシー'),
-                            onTap: () {
-                                Navigator.pop(context);
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute<Null>(
-                                        settings: const RouteSettings(name: "/feeds"),
-                                        builder: (BuildContext context) {
-                                            return new SimpleShowWeb(
-                                                'プライバシーポリシー',
-                                                'https://watarusuzuki.github.io/KixFeed-Flutter/privacy_policy.html'
-                                            );
-                                        })
-                                );
-                            },
-                        ),
-                    ],
-                ),
+            drawer: MainDrawer.instantiateDrawerHeader(
+                context,
+                _textPosts,
+                _textFavorites,
+                _textNews,
+                tapDrawerBody
             ),
         );
     }
@@ -166,38 +160,42 @@ class _MyHomePageState extends State<MyHomePage> {
     Future<List<RssItem>> _getData() async {
         interstitialAd.load();
 
-        if (_isShowingFavorites) {
-            if (_favoriteItems.isEmpty) {
-                SharedPreferences pref = await SharedPreferences.getInstance();
-                _favoriteKeys = pref.getKeys();
-
-                _favoriteKeys.forEach((key) {
-                    if (key.contains('link:')) {
-                        var title = key.replaceAll('link:', '');
-                        _favoriteItems.add(RssItem(
-                            title: title,
-                            description: pref.getString('description:$title'),
-                            link: pref.getString(key)
-                        ));
+        switch (_selection) {
+            case Selection.posts:
+                break;
+            case Selection.news:
+                if (_newsItems.isEmpty) {
+                    var feedUrls = [
+                        'http://sneakerbucks.com/feed',
+                        'https://sneakerwars.jp/items.rss'
+                    ];
+                    for (var url in feedUrls) {
+                        var httpResponse = await http.get(url);
+                        var feed = RssFeed.parse(httpResponse.body); // for parsing RSS feed
+                        _newsItems += feed.items;
                     }
-                });
-            }
-            _feedItems = _favoriteItems;
-        } else {
-            if (_newsItems.isEmpty) {
-                var feedUrls = [
-                    'http://sneakerbucks.com/feed',
-                    'https://sneakerwars.jp/items.rss'
-                ];
-                for (var url in feedUrls) {
-                    var httpResponse = await http.get(url);
-                    var feed = RssFeed.parse(httpResponse.body); // for parsing RSS feed
-                    _newsItems += feed.items;
                 }
-            }
+                _feedItems = _newsItems;
+                break;
+            case Selection.favorites:
+                if (_favoriteItems.isEmpty) {
+                    SharedPreferences pref = await SharedPreferences.getInstance();
+                    _favoriteKeys = pref.getKeys();
 
-            _feedItems = _newsItems;
+                    _favoriteKeys.forEach((key) {
+                        if (key.contains('link:')) {
+                            var title = key.replaceAll('link:', '');
+                            _favoriteItems.add(RssItem(
+                                title: title,
+                                description: pref.getString('description:$title'),
+                                link: pref.getString(key)
+                            ));
+                        }
+                    });
+                }
+                _feedItems = _favoriteItems;
         }
+
         _feedItems.sort(
                 (b, a) =>
                 parsePubDate(a.pubDate).compareTo(parsePubDate(b.pubDate)));
