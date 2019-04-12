@@ -32,21 +32,18 @@ class MainDrawer {
                         title: Text(textPosts),
                         onTap: () {
                             tap(Selection.posts);
-                            Navigator.pop(context);
                         },
                     ),
                     ListTile(
                         title: Text(textNews),
                         onTap: () {
-                            tap(Selection.favorites);
-                            Navigator.pop(context);
+                            tap(Selection.news);
                         },
                     ),
                     ListTile(
                         title: Text(textFavorites),
                         onTap: () {
                             tap(Selection.favorites);
-                            Navigator.pop(context);
                         },
                     ),
                     ListTile(

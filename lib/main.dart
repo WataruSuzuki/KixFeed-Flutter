@@ -4,6 +4,8 @@ import 'package:intl/intl.dart';
 import 'package:webfeed/webfeed.dart';
 import 'package:firebase_admob/firebase_admob.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:io';
 
 import 'drawer_header.dart';
 import 'detail_feed_post.dart';
@@ -77,18 +79,14 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     tapDrawerBody(Selection next) {
+        Navigator.pop(context);
         setState(() {
             _selection = next;
         });
-        Navigator.pop(context);
     }
 
     @override
     Widget build(BuildContext context) {
-        var titles = [
-            _textNews,
-            _textFavorites
-        ];
         var futureBuilder = new FutureBuilder(
             future: _getData(),
             builder: (BuildContext context, AsyncSnapshot snapshot) {
@@ -109,7 +107,7 @@ class _MyHomePageState extends State<MyHomePage> {
         var popupMenu = List<PopupMenuEntry<String>>();
 
         var keys = [
-            '(・∀・)'
+            '(・∀・)',
             '更新',
             'お気に入りを削除'
         ];
@@ -119,6 +117,11 @@ class _MyHomePageState extends State<MyHomePage> {
             key: Key(menuKey.toString()),
             child: Text(menuKey.toString()),)
         );
+        var titles = [
+            _textPosts,
+            _textNews,
+            _textFavorites
+        ];
 
         return new Scaffold(
             appBar: new AppBar(
