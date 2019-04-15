@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:webfeed/webfeed.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:math';
+import 'package:flutter/cupertino.dart';
+
+import 'pick_post.dart';
 
 class DetailFeedPost extends StatelessWidget {
     final RssItem item;
@@ -21,18 +25,26 @@ class DetailFeedPost extends StatelessWidget {
             ),
             floatingActionButton: FloatingActionButton(
                 onPressed: () {
-                    saveData();
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute<Null>(
+                            settings: const RouteSettings(name: "/feeds"),
+                            builder: (BuildContext context) {
+                                return PickPost(item);
+                            },
+                            fullscreenDialog: true,
+                        )
+                    );
                 },
-                child: Icon(Icons.favorite),
+                child: Icon(Icons.thumb_up),
                 backgroundColor: Colors.pink,
             )
         );
     }
 
-    saveData() async {
+    static deleteData(String removeKey) async {
         SharedPreferences pref = await SharedPreferences.getInstance();
-        await pref.setString('link:' + item.title, item.link);
-        await pref.setString('description:' + item.title, item.description);
+        await pref.remove(removeKey);
     }
 
     static String parseImageUrl(String material) {

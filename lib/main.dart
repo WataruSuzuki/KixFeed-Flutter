@@ -49,7 +49,7 @@ class _MyHomePageState extends State<MyHomePage> {
     Selection _selection = Selection.news;
     final String _textPosts = 'ピック＆トーク';
     final String _textNews = 'ニュース一覧';
-    final String _textFavorites = 'お気に入り一覧';
+    final String _textFavorites = 'ピック一覧';
     Set<String> _favoriteKeys;
 
     InterstitialAd interstitialAd = InterstitialAd(
@@ -109,7 +109,7 @@ class _MyHomePageState extends State<MyHomePage> {
         var keys = [
             '(・∀・)',
             '更新',
-            'お気に入りを削除'
+            'ピックを端末から削除'
         ];
         var menuKey = keys[_selection.index];
         popupMenu.add(PopupMenuItem<String>(
@@ -133,7 +133,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 case '更新':
                                     _refresh();
                                     break;
-                                case 'お気に入りを削除':
+                                case 'ピックを端末から削除':
                                     _favoriteKeys.forEach((key) {
                                         DetailFeedPost.deleteData(key);
                                     });
@@ -222,7 +222,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 itemCount: feedItems.length,
                 itemBuilder: (BuildContext context, int index) {
                     return GestureDetector(
-                        child: new Card(
+                        child: Card(
                             child: Column(
                                 children: <Widget>[
                                     Image.network(DetailFeedPost.parseImageUrl(
