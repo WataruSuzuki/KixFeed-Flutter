@@ -85,9 +85,8 @@ class _MyHomePageState extends State<MyHomePage> {
         });
     }
 
-    @override
-    Widget build(BuildContext context) {
-        var futureBuilder = new FutureBuilder(
+    FutureBuilder futureBuilder(BuildContext context) {
+        return FutureBuilder(
             future: _getData(),
             builder: (BuildContext context, AsyncSnapshot snapshot) {
                 switch (snapshot.connectionState) {
@@ -99,11 +98,39 @@ class _MyHomePageState extends State<MyHomePage> {
                     default:
                         if (snapshot.hasError)
                             return new Text('Error: ${snapshot.error}');
-                        else
-                            return createListView(context, snapshot);
+                        } else {
+                            return createFeedList(context, snapshot.data);
+                        }
                 }
             },
         );
+    }
+
+    StreamBuilder<QuerySnapshot> streamBuilder(BuildContext context) {
+        return StreamBuilder<QuerySnapshot>(
+            stream: Firestore.instance.collection('picked').snapshots(),
+            builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                if (snapshot.hasError)
+                    return new Text('Error: ${snapshot.error}');
+                switch (snapshot.connectionState) {
+                    case ConnectionState.none:
+                    case ConnectionState.waiting:
+                        return new Center(
+                            child: CircularProgressIndicator(),
+                        );
+                    default:
+                        if (snapshot.hasError) {
+                            return new Text('Error: ${snapshot.error}');
+                        } else {
+                            return createPickedList(context, snapshot.data.documents);
+                        }
+                }
+            },
+        );
+    }
+
+    @override
+    Widget build(BuildContext context) {
         var popupMenu = List<PopupMenuEntry<String>>();
 
         var keys = [
@@ -149,7 +176,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     )
                 ],
             ),
-            body: futureBuilder,
+            body: _selection == Selection.posts ? streamBuilder(context) : futureBuilder(context),
             drawer: MainDrawer.instantiateDrawerHeader(
                 context,
                 _textPosts,
@@ -213,30 +240,78 @@ class _MyHomePageState extends State<MyHomePage> {
         return date;
     }
 
-    Widget createListView(BuildContext context, AsyncSnapshot snapshot) {
-        List<RssItem> feedItems = snapshot.data;
+    Widget createPickedList(BuildContext context, List<DocumentSnapshot> documents) {
         return new RefreshIndicator(
-            child: feedItems.isEmpty
+            child: documents.isEmpty
                 ? Center(child: Text('データがありません', style: TextStyle(fontSize: 24),))
                 :ListView.builder(
-                itemCount: feedItems.length,
+                itemCount: documents.length,
+                itemBuilder: (BuildContext context, int index) {
+                    return GestureDetector(
+                        child: Card(
+                            child: Column(
+                                children: <Widget>[
+                                    Image.network(documents[index]['image'],
+                                        height: 300,
+                                        width: 500,
+                                        fit: BoxFit.cover,
+                                    ),
+                                    Container(
+                                        margin: EdgeInsets.all(10.0),
+                                        child: ListTile(
+                                            title: Text(documents[index]['title']),
+                                            subtitle:
+                                            Text(documents[index]['description']
+                                            ),
+                                            isThreeLine: true,
+                                        )),
+                                ],
+                            ),
+                        ),
+                        onTapUp: (details) {
+                            interstitialAd.show();
+                        },
+                    );
+                },
+            ),
+            onRefresh: _refresh,
+        );
+        return new ListView(
+            children: documents.map((DocumentSnapshot document) {
+                return new ListTile(
+                    title: new Text(document['title']),
+                    subtitle: new Text(document['description']),
+                );
+            }).toList(),
+        );
+    }
+
+    Widget createFeedList(BuildContext context, List<RssItem> feeds) {
+        return new RefreshIndicator(
+            child: feeds.isEmpty
+                ? Center(child: Text('データがありません', style: TextStyle(fontSize: 24),))
+                :ListView.builder(
+                itemCount: feeds.length,
                 itemBuilder: (BuildContext context, int index) {
                     return GestureDetector(
                         child: Card(
                             child: Column(
                                 children: <Widget>[
                                     Image.network(DetailFeedPost.parseImageUrl(
-                                        feedItems[index].content != null
-                                            ? feedItems[index].content.images.first
-                                            : feedItems[index].description)
+                                        feeds[index].content != null
+                                            ? feeds[index].content.images.first
+                                            : feeds[index].description),
+                                        height: 300,
+                                        width: 500,
+                                        fit: BoxFit.cover,
                                     ),
                                     Container(
                                         margin: EdgeInsets.all(10.0),
                                         child: ListTile(
-                                            title: Text(feedItems[index].title),
+                                            title: Text(feeds[index].title),
                                             subtitle:
                                             Text(DetailFeedPost.parseDescription(
-                                                feedItems[index].description)
+                                                feeds[index].description)
                                             ),
                                             isThreeLine: true,
                                         )),
@@ -251,7 +326,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                     settings: const RouteSettings(name: "/feeds"),
                                     builder: (BuildContext context) {
                                         return new DetailFeedPost(
-                                            feedItems[index]
+                                            feeds[index]
                                         );
                                     })
                             );
