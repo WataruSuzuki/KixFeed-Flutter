@@ -34,6 +34,7 @@ dependencies:
 
   # Use Firebase modules.
   cloud_firestore: ^0.12.6
+  firebase_auth: ^0.11.1+7
 
 dev_dependencies:
   flutter_test:
