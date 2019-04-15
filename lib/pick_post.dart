@@ -51,19 +51,23 @@ class _PickPostState extends State<PickPost> {
     void commentToPickedFeed(String comment) {
         var ref = Firestore.instance.collection("picked")
             .document(generateMd5(item.link));
-        ref.setData({
+        Map<String, dynamic> data = {
             'title': item.title,
             'description': DetailFeedPost.parseDescription(item.description),
             'image': DetailFeedPost.parseImageUrl(
                 item.content != null
-                ? item.content.images.first
-                : item.description),
-            'link': item.link
-        });
-        ref.collection('userId').add({
-            "comment": comment,
-            "datetime": DateTime.now()
-        });
+                    ? item.content.images.first
+                    : item.description),
+            'link': item.link,
+            'comments': {
+                'user001': {
+                    'userId': 'user001',
+                    'comment': comment,
+                    'datetime': DateTime.now()
+                }
+            }
+        };
+        ref.setData(data, merge: true);
     }
 
     @override

@@ -5,6 +5,7 @@ import 'package:webfeed/webfeed.dart';
 import 'package:firebase_admob/firebase_admob.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:math';
 import 'dart:io';
 
 import 'drawer_header.dart';
@@ -247,26 +248,50 @@ class _MyHomePageState extends State<MyHomePage> {
                 :ListView.builder(
                 itemCount: documents.length,
                 itemBuilder: (BuildContext context, int index) {
+                    String comment = documents[index]['description'];
                     return GestureDetector(
                         child: Card(
-                            child: Column(
+                            child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: <Widget>[
+                                    Expanded(
+                                        child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: <Widget>[
+                                                Container(
+                                                    margin: EdgeInsets.all(10.0),
+                                                    child: ListTile(
+                                                        title: Text(
+                                                            documents[index]['title'],
+                                                            style: TextStyle(fontSize: 12.0)
+                                                        ),
+                                                    )
+                                                ),
+                                                Container(
+                                                    margin: EdgeInsets.all(10.0),
+                                                    child: Row(
+                                                        mainAxisAlignment: MainAxisAlignment.start,
+                                                        children: <Widget>[
+                                                            Image.network(documents[index]['image'],
+                                                                height: 20,
+                                                                width: 20,
+                                                                fit: BoxFit.cover,
+                                                            ),
+                                                            Text(comment.substring(0, min(15, comment.length))),
+                                                        ],
+                                                    ),
+                                                ),
+
+                                            ]
+                                        ),
+                                    ),
                                     Image.network(documents[index]['image'],
-                                        height: 300,
-                                        width: 500,
+                                        height: 100,
+                                        width: 100,
                                         fit: BoxFit.cover,
                                     ),
-                                    Container(
-                                        margin: EdgeInsets.all(10.0),
-                                        child: ListTile(
-                                            title: Text(documents[index]['title']),
-                                            subtitle:
-                                            Text(documents[index]['description']
-                                            ),
-                                            isThreeLine: true,
-                                        )),
                                 ],
-                            ),
+                            )
                         ),
                         onTapUp: (details) {
                             interstitialAd.show();
