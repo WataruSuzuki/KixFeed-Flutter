@@ -9,6 +9,7 @@ import 'dart:math';
 import 'dart:io';
 
 import 'drawer_header.dart';
+import 'talking_picked.dart';
 import 'detail_feed_post.dart';
 
 const String admobAppId = 'ca-app-pub-3940256099942544~3347511713';
@@ -295,19 +296,21 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                         onTapUp: (details) {
                             interstitialAd.show();
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute<Null>(
+                                    settings: const RouteSettings(name: "/feeds"),
+                                    builder: (BuildContext context) {
+                                        return TalkingPicked(
+                                            documents[index]['comments']
+                                        );
+                                    })
+                            );
                         },
                     );
                 },
             ),
             onRefresh: _refresh,
-        );
-        return new ListView(
-            children: documents.map((DocumentSnapshot document) {
-                return new ListTile(
-                    title: new Text(document['title']),
-                    subtitle: new Text(document['description']),
-                );
-            }).toList(),
         );
     }
 
