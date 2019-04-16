@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class TalkingPicked extends StatefulWidget {
-    final Map<dynamic, dynamic> item;
+    final String item;
 
     TalkingPicked(this.item);
 
@@ -11,7 +11,7 @@ class TalkingPicked extends StatefulWidget {
 }
 
 class _TalkingPickedState extends State<TalkingPicked> {
-    final Map<dynamic, dynamic> item;
+    final String item;
 
     _TalkingPickedState(this.item);
 
@@ -32,13 +32,13 @@ class _TalkingPickedState extends State<TalkingPicked> {
     @override
     Widget build(BuildContext context) {
         return Scaffold(
-            appBar: AppBar(title: Text('📮')),
+            appBar: AppBar(title: Text('(・∀・)')),
             body: streamBuilder(context),
-            floatingActionButton: FloatingActionButton(
-                onPressed: () {},
-                child: Icon(Icons.add),
-                backgroundColor: Colors.pink,
-            ),
+//            floatingActionButton: FloatingActionButton(
+//                onPressed: () {},
+//                child: Icon(Icons.add),
+//                backgroundColor: Colors.pink,
+//            ),
         );
     }
 
@@ -67,17 +67,19 @@ class _TalkingPickedState extends State<TalkingPicked> {
         );
     }
 
-    Widget createPickedList(BuildContext context,
-        List<DocumentSnapshot> documents) {
+    Widget createPickedList(BuildContext context, List<DocumentSnapshot> documents) {
+        DocumentSnapshot document = documents.firstWhere((f) => f.documentID == item);
+        Map<dynamic, dynamic> comments = document['comments'];
+        List commentList = comments.values.toList();
         return new RefreshIndicator(
-            child: documents.isEmpty
+            child: commentList.isEmpty
                 ? Center(
                 child: Text(
                     'データがありません',
                     style: TextStyle(fontSize: 24),
                 ))
                 : ListView.builder(
-                itemCount: documents.length,
+                itemCount: commentList.length,
                 itemBuilder: (BuildContext context, int index) {
                     return GestureDetector(
                         child: Card(
@@ -85,7 +87,7 @@ class _TalkingPickedState extends State<TalkingPicked> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: <Widget>[
                                     Image.network(
-                                        'https://image.flaticon.com/icons/png/512/36/36601.png',
+                                        'https://cdn2.iconfinder.com/data/icons/people-80/96/Picture1-512.png',
                                         height: 50,
                                         width: 50,
                                         fit: BoxFit.cover,
@@ -99,9 +101,15 @@ class _TalkingPickedState extends State<TalkingPicked> {
                                                         10.0),
                                                     child: ListTile(
                                                         title: Text(
-                                                            'hoge',
+                                                            commentList[index]['comment'],
                                                             style: TextStyle(
-                                                                fontSize: 12.0)),
+                                                                fontSize: 12.0)
+                                                        ),
+                                                        subtitle: Text(
+                                                            (commentList[index]['datetime'] as Timestamp).toDate().toString(),
+                                                            style: TextStyle(
+                                                                fontSize: 10.0)
+                                                        ),
                                                     )),
                                             ]),
                                     ),

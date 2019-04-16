@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:webfeed/webfeed.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:convert';
 import 'package:convert/convert.dart';
 import 'package:crypto/crypto.dart' as crypto;
@@ -23,6 +24,7 @@ class _PickPostState extends State<PickPost> {
 
     FocusNode _focusNode = FocusNode();
     final myController = TextEditingController();
+    FirebaseUser _user;
 
     saveData() async {
         SharedPreferences pref = await SharedPreferences.getInstance();
@@ -33,6 +35,9 @@ class _PickPostState extends State<PickPost> {
     @override
     void initState() {
         super.initState();
+        final FirebaseAuth _auth = FirebaseAuth.instance;
+        _auth.signInAnonymously()
+            .then((FirebaseUser user) => _user = user);
     }
 
     @override
@@ -60,8 +65,8 @@ class _PickPostState extends State<PickPost> {
                     : item.description),
             'link': item.link,
             'comments': {
-                'user001': {
-                    'userId': 'user001',
+                _user.uid: {
+                    'userId': _user.uid,
                     'comment': comment,
                     'datetime': DateTime.now()
                 }

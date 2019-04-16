@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:webfeed/webfeed.dart';
 import 'package:firebase_admob/firebase_admob.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:math';
 import 'dart:io';
@@ -60,6 +61,16 @@ class _MyHomePageState extends State<MyHomePage> {
             print("InterstitialAd event is $event");
         },
     );
+
+    FirebaseUser _user;
+
+    @override
+    void initState() {
+        super.initState();
+        final FirebaseAuth _auth = FirebaseAuth.instance;
+        _auth.signInAnonymously()
+            .then((FirebaseUser user) => _user = user);
+    }
 
     Future<void> _refresh() async {
         if (await interstitialAd.isLoaded()) {
@@ -136,7 +147,7 @@ class _MyHomePageState extends State<MyHomePage> {
         var popupMenu = List<PopupMenuEntry<String>>();
 
         var keys = [
-            '(・∀・)',
+            '更新',
             '更新',
             'ピックを端末から削除'
         ];
@@ -249,7 +260,11 @@ class _MyHomePageState extends State<MyHomePage> {
                 :ListView.builder(
                 itemCount: documents.length,
                 itemBuilder: (BuildContext context, int index) {
-                    String comment = documents[index]['description'];
+                    Map<dynamic, dynamic> comments = documents[index]['comments'];
+                    comments.values.forEach((dynamic hogefuga) {
+                        print(hogefuga);
+                    });
+                    String comment = comments.values.first['comment'];
                     return GestureDetector(
                         child: Card(
                             child: Row(
@@ -273,12 +288,15 @@ class _MyHomePageState extends State<MyHomePage> {
                                                     child: Row(
                                                         mainAxisAlignment: MainAxisAlignment.start,
                                                         children: <Widget>[
-                                                            Image.network(documents[index]['image'],
+                                                            Image.network('https://cdn2.iconfinder.com/data/icons/people-80/96/Picture1-512.png',
                                                                 height: 20,
                                                                 width: 20,
                                                                 fit: BoxFit.cover,
                                                             ),
-                                                            Text(comment.substring(0, min(15, comment.length))),
+                                                            Container(
+                                                                margin: EdgeInsets.all(10.0),
+                                                                child: Text(comment.substring(0, min(15, comment.length))),
+                                                            ),
                                                         ],
                                                     ),
                                                 ),
@@ -302,7 +320,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                     settings: const RouteSettings(name: "/feeds"),
                                     builder: (BuildContext context) {
                                         return TalkingPicked(
-                                            documents[index]['comments']
+                                            documents[index].documentID
                                         );
                                     })
                             );
