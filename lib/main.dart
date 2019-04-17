@@ -12,6 +12,7 @@ import 'dart:io';
 import 'drawer_header.dart';
 import 'talking_picked.dart';
 import 'detail_feed_post.dart';
+import 'simple_show_web.dart';
 
 const String admobAppId = 'ca-app-pub-3940256099942544~3347511713';
 String admobInterstitialId = InterstitialAd.testAdUnitId;
@@ -109,7 +110,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             child: CircularProgressIndicator(),
                         );
                     default:
-                        if (snapshot.hasError)
+                        if (snapshot.hasError) {
                             return new Text('Error: ${snapshot.error}');
                         } else {
                             return createFeedList(context, snapshot.data);
