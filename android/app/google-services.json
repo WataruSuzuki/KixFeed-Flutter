@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "196172853149",
+    "firebase_url": "https://kix-feed.firebaseio.com",
+    "project_id": "kix-feed",
+    "storage_bucket": "kix-feed.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:196172853149:android:1ebcbd8e93d04cc8",
+        "android_client_info": {
+          "package_name": "jp.co.jchankchan.kix_feed"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "196172853149-tq8857q0aknb73gtkrm1dbg7jep7o15b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "hogefuga"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "196172853149-tq8857q0aknb73gtkrm1dbg7jep7o15b.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "196172853149-8rcn9d8qsmtp30eborogd1ejpsatc3oc.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "jp.co.jchankchan.kixFeed"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
